@@ -170,3 +170,4 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 scenario1/test.ipynb
+scenario1/test2.ipynb
