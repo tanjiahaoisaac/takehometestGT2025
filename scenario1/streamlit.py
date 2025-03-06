@@ -6,9 +6,9 @@ from src.normalisation import normalise_data
 from src.filter_events import extract_event_data
 from src.rating_analyser import analyze_rating_thresholds
 import io
-
+import os
 # Streamlit app layout and logic
-
+st.write(f"Current working directory: {os.getcwd()}")
 # Title and description
 st.title('Restaurant Data Analysis Tool')
 st.write("GT Take home scenario 1")
