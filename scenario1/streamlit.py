@@ -7,6 +7,7 @@ from src.filter_events import extract_event_data
 from src.rating_analyser import analyze_rating_thresholds
 import io
 import os
+from pathlib import Path
 
 # Get the current directory of the script
 dir = Path(__file__).resolve()
