@@ -6,9 +6,9 @@ from src.normalisation import normalise_data
 from src.filter_events import extract_event_data
 from src.rating_analyser import analyze_rating_thresholds
 import io
-import os
-# Streamlit app layout and logic
-st.write(f"Current working directory: {os.getcwd()}")
+
+
+
 # Title and description
 st.title('Restaurant Data Analysis Tool')
 st.write("GT Take home scenario 1")
@@ -24,7 +24,7 @@ data = fetch_restaurant_data_from_api("https://raw.githubusercontent.com/Papagoa
 df_normal, df_events = normalise_data(data)
 
 # Process restaurant details
-df_details = restaurant_details_processing(df_normal, df_events, '/mount/src/takehometestgt2025/data/Country-Code.xlsx', 'output/')
+df_details = restaurant_details_processing(df_normal, df_events, 'data/Country-Code.xlsx', 'output/')
 
 st.subheader("1. Restaurant Details Data")
 st.dataframe(df_details)
@@ -111,12 +111,3 @@ st.dataframe(scores_range)
 st.write("Foreign Text to English Map:")
 st.dataframe(foreign_text_to_english_map)
 
-
-# Define the path to your existing Excel file
-file_path = 'data/Country-Code.xlsx'
-
-# Read the Excel file into a DataFrame
-df = pd.read_excel(file_path)
-
-# Display the DataFrame in the Streamlit app
-st.dataframe(df)
