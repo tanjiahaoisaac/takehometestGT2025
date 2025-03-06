@@ -13,7 +13,19 @@ def load_country_codes(country_code_file_path):
         list: List of country codes.
         dict: Mapping of country codes to country names.
     """
-    country_codes_df = pd.read_excel(country_code_file_path)
+    if not os.path.isfile(country_code_file_path):
+        raise FileNotFoundError(f"The file {country_code_file_path} does not exist.")
+    try:
+        country_codes_df = pd.read_excel(country_code_file_path)
+    except Exception as e:
+        raise ValueError(f"An error occurred while reading the file: {e}")
+    
+    # Ensure required columns exist
+    required_columns = ['Country Code', 'Country']
+    missing_columns = [col for col in required_columns if col not in country_codes_df.columns]
+    if missing_columns:
+        raise KeyError(f"Missing required columns in the Country-Code file: {', '.join(missing_columns)}")
+
     country_code_array = country_codes_df['Country Code'].tolist()
     country_mapping = country_codes_df.set_index('Country Code')['Country'].to_dict()
 
@@ -31,6 +43,9 @@ def filter_restaurants_by_country(df, country_code_array):
     Returns:
         pandas dataframe: Filtered dataframe with valid countries.
     """
+    if 'country_id' not in df.columns:
+        raise KeyError("The 'country_id' column is missing from the restaurant DataFrame.")
+    
     return df[df['country_id'].isin(country_code_array)]
 
 
@@ -45,7 +60,14 @@ def add_country_name(df, country_mapping):
     Returns:
         pandas dataframe: dataframe with added 'Country' column.
     """
+    if 'country_id' not in df.columns:
+        raise KeyError("The 'country_id' column is missing from the dataframe.")
+    
     df['Country Name'] = df['country_id'].map(country_mapping)
+    
+    if df['Country Name'].isnull().any():
+        raise ValueError("Some country codes could not be mapped to valid country names.")
+    
     return df
 
 
@@ -61,6 +83,14 @@ def select_and_rename_columns(df, event_df):
     Returns:
         pandas dataframe: dataframe with selected and renamed columns, including the earliest event start date.
     """
+    if event_df.empty:
+        raise ValueError("The event DataFrame is empty.")
+    
+    required_event_columns = ['restaurant_res_id', 'start_date']
+    missing_columns = [col for col in required_event_columns if col not in event_df.columns]
+    if missing_columns:
+        raise KeyError(f"The event DataFrame is missing required columns: {', '.join(missing_columns)}")
+
     def get_earliest_event_date(row):
         # If 'zomato_events' is not NA
         if row['zomato_events'] != 'NA' and isinstance(row['zomato_events'], list) and len(row['zomato_events']) > 0:
@@ -120,20 +150,31 @@ def restaurant_details_processing(df, event_df, country_code_file_path, output_p
     Returns:
         pandas dataframe: The processed restaurant details data.
     """
-    # Load country codes
-    country_code_array, country_mapping = load_country_codes(country_code_file_path)
+    try:
+        # Check if input DataFrames are empty
+        if df.empty:
+            raise ValueError("The restaurant DataFrame is empty.")
+        if event_df.empty:
+            raise ValueError("The event DataFrame is empty.")
 
-    # Filter restaurants based on valid country codes
-    df_filtered = filter_restaurants_by_country(df, country_code_array)
+        # Load country codes
+        country_code_array, country_mapping = load_country_codes(country_code_file_path)
 
-    # Add 'Country' column to the dataframe
-    df_with_country = add_country_name(df_filtered, country_mapping)
+        # Filter restaurants based on valid country codes
+        df_filtered = filter_restaurants_by_country(df, country_code_array)
 
-    # Select relevant columns and rename them
-    df_selected = select_and_rename_columns(df_with_country, event_df)
+        # Add 'Country' column to the dataframe
+        df_with_country = add_country_name(df_filtered, country_mapping)
 
-    # Export the processed data to CSV
-    os.makedirs(output_path, exist_ok=True)
-    df_selected.to_csv(os.path.join(output_path, 'processed_restaurant_data.csv'), index=False)
+        # Select relevant columns and rename them
+        df_selected = select_and_rename_columns(df_with_country, event_df)
 
-    return df_selected
+        # Export the processed data to CSV
+        os.makedirs(output_path, exist_ok=True)
+        df_selected.to_csv(os.path.join(output_path, 'processed_restaurant_data.csv'), index=False)
+
+        return df_selected
+
+    except (FileNotFoundError, KeyError, ValueError) as e:
+        print(f"Error during processing: {e}")
+        return None
