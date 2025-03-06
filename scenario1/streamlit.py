@@ -16,8 +16,6 @@ dir = Path(__file__).resolve()
 # Add the parent directory (project root) to sys.path
 sys.path.append(dir.parent)  # Add the parent directory (project root)
 
-# Check the current working directory for debugging
-st.write(f"Current working directory: {os.getcwd()}")
 
 # Define the correct path to your Excel file
 file_path = dir.parent / 'data' / 'Country-Code.xlsx'
