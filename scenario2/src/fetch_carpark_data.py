@@ -25,10 +25,11 @@ def fetch_carpark_data_from_api(api_url, headers=None):
         print("Error: Failed to connect to the API. Check your internet connection.")
     except requests.exceptions.HTTPError as e:
         print(f"HTTP Error: {e}")
-    except requests.exceptions.RequestException as e:
-        print(f"Error during API request: {e}")
     except ValueError:
         print("Error: Response returned is not valid JSON.")
+    except requests.exceptions.RequestException as e:
+        print(f"Error during API request: {e}")
+    
 
     return {}  # Return an empty dictionary on failure
 
@@ -69,7 +70,6 @@ def main():
         carpark_data = fetch_carpark_data_from_api(api_url)
 
         if not carpark_data or not carpark_data.get("items"):
-            print("Error: Fetched data is empty or malformed. No car park data available.")
             return
 
         output_dir = "../output"

@@ -88,10 +88,21 @@ def main_loop():
             if final_df is None:
                 print("\nFetching car park data...")
                 fetched_data = fetch_carpark_data_from_api(api_url)
-
-                if not fetched_data:
+                
+                # Check if fetched data is empty, indicating an issue
+                if not fetched_data or fetched_data == {}:
                     print("Error: No data fetched from the API.")
-                    continue
+                    
+                    # Prompt user to either retry or exit
+                    user_input = input("Press 'R' to retry fetching the data or 'exit' to quit: ").strip()
+                    if user_input.lower() == 'exit':
+                        print("\nExiting the program.")
+                        break
+                    elif user_input.lower() == 'r':
+                        continue  # Retry fetching data
+                    else:
+                        print("Invalid input. Please enter 'R' to retry or 'exit' to quit.")
+                        continue
 
                 try:
                     print("\nProcessing car park data...")

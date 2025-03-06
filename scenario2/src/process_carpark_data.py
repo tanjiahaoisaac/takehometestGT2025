@@ -14,7 +14,7 @@ def parse_fetched_data(api_response):
     """
     carpark_rows = []
 
-    for item in api_response.get("items", []):
+    for item in api_response.get("items", []):  
         for carpark in item.get("carpark_data", []):
             if "carpark_info" not in carpark or not carpark["carpark_info"]:
                 print(f"Warning: Missing 'carpark_info' for car park {carpark.get('carpark_number', 'Unknown')}.")
