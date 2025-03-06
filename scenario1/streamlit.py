@@ -29,15 +29,16 @@ df_details = restaurant_details_processing(df_normal, df_events, 'data/Country-C
 st.subheader("1. Restaurant Details Data")
 st.dataframe(df_details)
 
-# Create a download button
-csv = df_details.to_csv(index=False)  # Convert the dataframe to CSV format
-st.download_button(
-    label="Download Restaurant Details Data as CSV",  # Text on the button
-    data=csv,  # Data to be downloaded
-    file_name=f"restaurant_details_data.csv",  # File name
-    mime="text/csv",  # MIME type for CSV
-    use_container_width=True,  # Make button span the width of the container
-)
+if df_details is not None:
+    # Create a download button
+    csv = df_details.to_csv(index=False)  # Convert the dataframe to CSV format
+    st.download_button(
+        label="Download Restaurant Details Data as CSV",  # Text on the button
+        data=csv,  # Data to be downloaded
+        file_name=f"restaurant_details_data.csv",  # File name
+        mime="text/csv",  # MIME type for CSV
+        use_container_width=True,  # Make button span the width of the container
+    )
 
 st.write("###")
 
