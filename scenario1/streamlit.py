@@ -24,7 +24,7 @@ data = fetch_restaurant_data_from_api("https://raw.githubusercontent.com/Papagoa
 df_normal, df_events = normalise_data(data)
 
 # Process restaurant details
-df_details = restaurant_details_processing(df_normal, df_events, 'data/Country-Code.xlsx', 'output/')
+df_details = restaurant_details_processing(df_normal, df_events, 'Country-Code.xlsx', 'output/')
 
 st.subheader("1. Restaurant Details Data")
 st.dataframe(df_details)
