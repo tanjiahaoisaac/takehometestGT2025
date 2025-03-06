@@ -105,7 +105,18 @@ def extract_event_data(events_df, restaurant_df, year, month, output_path):
 
         # Select final columns to create the new dataframe
         final_df = month_events[['event_id', 'restaurant_res_id', 'restaurant_name', 'photo_url', 'title', 'start_date', 'end_date']]
-
+        
+        # Renaming columns
+        final_df.rename(columns={
+            'event_id': 'Event ID',
+            'restaurant_res_id': 'Restaurant ID',
+            'restaurant_name': 'Restaurant Name',
+            'photo_url': 'Photo URL(s)',
+            'title': 'Event Title',
+            'start_date': 'Start Date',
+            'end_date': 'End Date'
+        }, inplace=True)
+        
         # Ensure any missing value is filled with 'NA'
         final_df = final_df.fillna('NA')
 
