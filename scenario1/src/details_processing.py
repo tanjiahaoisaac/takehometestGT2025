@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 
+
 def load_country_codes(country_code_file_path):
     """
     Load the country codes from the provided xlsx file.
@@ -24,7 +25,7 @@ def filter_restaurants_by_country(df, country_code_array):
     Filter the restaurants data based on the valid country codes.
 
     Args:
-        df (pandas dataframe): The restaurant details data.
+        df (pandas dataframe): The restaurant details from normalise function.
         country_code_array (list): List of valid country codes.
 
     Returns:
@@ -48,18 +49,33 @@ def add_country_name(df, country_mapping):
     return df
 
 
-def select_and_rename_columns(df):
+def select_and_rename_columns(df, event_df):
     """
-    Select relevant columns and rename them to the required names.
+    Select relevant columns and rename them to the required names, 
+    also adding the earliest event start date if available.
 
     Args:
-        df (pandas dataframe): The restaurant details data.
+        df (pandas dataframe): The restaurant details from normalise function.
+        event_df (pandas dataframe): The events data for the restaurants.
 
     Returns:
-        pandas dataframe: dataframe with selected and renamed columns.
+        pandas dataframe: dataframe with selected and renamed columns, including the earliest event start date.
     """
-    # Select the relevant columns
-    df_selected = df[['id', 'name', 'Country Name', 'city', 'votes', 'aggregate_rating', 'cuisines', 'event.start_date']]
+    def get_earliest_event_date(row):
+        # If 'zomato_events' is not NA
+        if row['zomato_events'] != 'NA' and isinstance(row['zomato_events'], list) and len(row['zomato_events']) > 0:
+            # Find the earliest start date from event_df
+            restaurant_res_id = row['id']
+            events = event_df[event_df['restaurant_res_id'] == restaurant_res_id]
+            if not events.empty:
+                earliest_event = events['start_date'].min()
+                return earliest_event
+        return 'NA'  # If no event or event is NA
+
+    df['Event Start Date'] = df.apply(get_earliest_event_date, axis=1)
+
+    # Select the relevant columns from the original restaurant DataFrame
+    df_selected = df[['id', 'name', 'Country Name', 'city', 'votes', 'aggregate_rating', 'cuisines', 'Event Start Date']]
 
     # Rename the columns to the required names
     df_selected = df_selected.rename(columns={
@@ -70,7 +86,7 @@ def select_and_rename_columns(df):
         'votes': 'User Rating Votes',
         'aggregate_rating': 'User Aggregate Rating',
         'cuisines': 'Cuisines',
-        'event.start_date': 'Event Date'
+        'Event Start Date': 'Event Date'
     })
 
     # Optionally convert 'User Aggregate Rating' to float if it's not already
@@ -79,19 +95,7 @@ def select_and_rename_columns(df):
     return df_selected
 
 
-def export_to_csv(df, output_path):
-    """
-    Export the processed dataframe to a CSV file.
-
-    Args:
-        df (pandas dataframe): The processed dataframe.
-        output_path (str): Path where the processed CSV file should be saved.
-    """
-    os.makedirs(output_path, exist_ok=True)
-    df.to_csv(os.path.join(output_path, 'processed_restaurant_data.csv'), index=False)
-
-
-def restaurant_details_processing(df, country_code_file_path, output_path):
+def restaurant_details_processing(df, event_df, country_code_file_path, output_path):
     """
     Process the restaurant details data.
     Only include restaurants with matching Country Codes from the provided Country-Code.xlsx file.
@@ -109,7 +113,7 @@ def restaurant_details_processing(df, country_code_file_path, output_path):
     And export the processed data to a CSV file.
 
     Args:
-        df (pandas dataframe): The restaurant details data.
+        df (pandas dataframe): The restaurant details data from normalise function.
         country_code_file_path (str): Path to the 'Country-Code.xlsx' file containing valid country codes.
         output_path (str): Path where the processed CSV file should be saved.
 
@@ -126,9 +130,10 @@ def restaurant_details_processing(df, country_code_file_path, output_path):
     df_with_country = add_country_name(df_filtered, country_mapping)
 
     # Select relevant columns and rename them
-    df_selected = select_and_rename_columns(df_with_country)
+    df_selected = select_and_rename_columns(df_with_country, event_df)
 
     # Export the processed data to CSV
-    export_to_csv(df_selected, output_path)
+    os.makedirs(output_path, exist_ok=True)
+    df_selected.to_csv(os.path.join(output_path, 'processed_restaurant_data.csv'), index=False)
 
     return df_selected
