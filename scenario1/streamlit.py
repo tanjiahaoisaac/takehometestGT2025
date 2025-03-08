@@ -119,6 +119,8 @@ else:
 st.subheader("Task 2. Ratings")
 st.write("Score Range:")
 st.dataframe(scores_range)
+st.write("The score range for each text category as gotten from the data. May not be reflective of actual range zomato is using as this is from our data.")
 st.write("Foreign Text to English Map:")
 st.dataframe(foreign_text_to_english_map)
+st.write("I look at text rating that do not fit into our categories given. I noticed either they were foreign text rating or cause 'Not Rated'. Since I have the rating score, I mapped them to their score range to find the corresponding english text rating.")
 

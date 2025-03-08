@@ -84,6 +84,15 @@ def extract_event_data(events_df, restaurant_df, year, month, output_path):
             raise ValueError("The events DataFrame is empty.")
         if restaurant_df.empty:
             raise ValueError("The restaurant DataFrame is empty.")
+        # Check if year and month are integers
+        if not isinstance(year, int):
+            raise TypeError(f"Expected 'year' to be an integer, but got {type(year).__name__}.")
+        if not isinstance(month, int):
+            raise TypeError(f"Expected 'month' to be an integer, but got {type(month).__name__}.")
+        
+        # Ensure the month is within a valid range (1-12)
+        if not (1 <= month <= 12):
+            raise ValueError(f"Month value {month} is invalid. Must be between 1 and 12.")
 
         # Filter events by month
         month_events = filter_events_by_month(events_df, year, month)
