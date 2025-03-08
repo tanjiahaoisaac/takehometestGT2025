@@ -47,7 +47,6 @@ cd scenario1
 ```
 (OPTIONAL)Create and activate a virtual environment:
 ```bash
-cd scenario1
 python -m venv venv
 venv\Scripts\activate #FOR WINDOWS
 
@@ -80,7 +79,6 @@ cd scenario2
 ```
 (OPTIONAL)Create and activate a virtual environment:
 ```bash
-cd scenario2
 python -m venv venv
 venv\Scripts\activate #FOR WINDOWS
 ```
